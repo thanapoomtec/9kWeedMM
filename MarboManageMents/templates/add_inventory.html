@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">เพิ่มสต็อกสินค้า</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="{{ url_for('inventory') }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left me-2"></i>กลับไปยังสต็อกสินค้า</a>
+    </div>
+</div>
+<div class="card">
+    <div class="card-body">
+        <form method="POST">
+            <div class="mb-3">
+                <label for="name" class="form-label">ชื่อสินค้า</label>
+                <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+            <div class="mb-3">
+                <label for="flavor" class="form-label">รสชาติ</label>
+                <input type="text" class="form-control" id="flavor" name="flavor" required>
+            </div>
+            <div class="mb-3">
+                <label for="price" class="form-label">ราคา (บาท)</label>
+                <input type="number" class="form-control" id="price" name="price" step="0.01" min="0" required>
+            </div>
+            <div class="mb-3">
+                <label for="cost" class="form-label">ต้นทุน (บาท)</label>
+                <input type="number" class="form-control" id="cost" name="cost" step="0.01" min="0" required>
+            </div>
+            <div class="mb-3">
+                <label for="quantity" class="form-label">จำนวน</label>
+                <input type="number" class="form-control" id="quantity" name="quantity" min="1" required>
+            </div>
+            <div class="mb-3">
+                <label for="notes" class="form-label">หมายเหตุ</label>
+                <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">บันทึกการเพิ่มสต็อก</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

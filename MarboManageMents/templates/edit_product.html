@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">แก้ไขสินค้า</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="{{ url_for('products') }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left me-2"></i>กลับไปยังรายการสินค้า</a>
+    </div>
+</div>
+<div class="card">
+    <div class="card-body">
+        <form method="POST" enctype="multipart/form-data">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="name" class="form-label">ชื่อสินค้า</label>
+                    <input type="text" class="form-control" id="name" name="name" value="{{ product.name }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="flavor" class="form-label">รสชาติ</label>
+                    <input type="text" class="form-control" id="flavor" name="flavor" value="{{ product.flavor }}" required>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">รายละเอียด</label>
+                <textarea class="form-control" id="description" name="description" rows="3">{{ product.description or '' }}</textarea>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label for="price" class="form-label">ราคาขาย (บาท)</label>
+                    <input type="number" class="form-control" id="price" name="price" value="{{ product.price }}" min="0" step="0.01" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="cost" class="form-label">ต้นทุน (บาท)</label>
+                    <input type="number" class="form-control" id="cost" name="cost" value="{{ product.cost }}" min="0" step="0.01" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="stock" class="form-label">จำนวนในสต็อก</label>
+                    <input type="number" class="form-control" id="stock" name="stock" value="{{ product.stock }}" min="0" required>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="image" class="form-label">รูปภาพสินค้า</label>
+                {% if product.image_path %}
+                <img src="{{ url_for('static', filename=product.image_path) }}" class="img-thumbnail mb-2" style="max-width: 200px;" alt="{{ product.name }} {{ product.flavor }}">
+                {% endif %}
+                <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                <div class="form-text">อัปโหลดรูปภาพใหม่เพื่อแทนที่ (ไม่จำเป็น)</div>
+            </div>
+            <button type="submit" class="btn btn-primary">บันทึกการเปลี่ยนแปลง</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
