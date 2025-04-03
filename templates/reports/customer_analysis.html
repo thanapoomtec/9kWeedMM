@@ -1,0 +1,338 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">การวิเคราะห์ลูกค้า</h1>
+  <div class="btn-toolbar mb-2 mb-md-0">
+      <a href="{{ url_for('reports') }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left me-2"></i>กลับไปยังรายงาน</a>
+  </div>
+</div>
+
+<div class="alert alert-info d-none" id="loading-alert">
+  <div class="d-flex align-items-center">
+    <div class="spinner-border spinner-border-sm me-2" role="status">
+      <span class="visually-hidden">กำลังโหลด...</span>
+    </div>
+    <div>กำลังโหลดข้อมูล กรุณารอสักครู่...</div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6">
+      <div class="card mb-4">
+          <div class="card-header">
+              <h5 class="mb-0">ลูกค้าที่มียอดซื้อสูงสุด</h5>
+          </div>
+          <div class="card-body">
+              <div class="table-responsive">
+                  <table class="table table-sm table-hover">
+                      <thead>
+                          <tr>
+                              <th>ลูกค้า</th>
+                              <th>จำนวนคำสั่งซื้อ</th>
+                              <th>ยอดซื้อรวม</th>
+                              <th>ครั้งล่าสุด</th>
+                          </tr>
+                      </thead>
+                      <tbody id="top-customers-table">
+                          <tr>
+                              <td colspan="4" class="text-center">กำลังโหลดข้อมูล...</td>
+                          </tr>
+                      </tbody>
+                  </table>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  <div class="col-md-6">
+      <div class="card mb-4">
+          <div class="card-header">
+              <h5 class="mb-0">ลูกค้าที่ไม่ได้ซื้อนาน</h5>
+          </div>
+          <div class="card-body">
+              <div class="table-responsive">
+                  <table class="table table-sm table-hover">
+                      <thead>
+                          <tr>
+                              <th>ลูกค้า</th>
+                              <th>ครั้งล่าสุด</th>
+                              <th>ยอดซื้อรวม</th>
+                              <th>การดำเนินการ</th>
+                          </tr>
+                      </thead>
+                      <tbody id="inactive-customers-table">
+                          <tr>
+                              <td colspan="4" class="text-center">กำลังโหลดข้อมูล...</td>
+                          </tr>
+                      </tbody>
+                  </table>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6">
+      <div class="card mb-4">
+          <div class="card-header">
+              <h5 class="mb-0">การกระจายตัวของลูกค้า</h5>
+          </div>
+          <div class="card-body">
+              <canvas id="customerDistributionChart" height="300"></canvas>
+          </div>
+      </div>
+  </div>
+  
+  <div class="col-md-6">
+      <div class="card mb-4">
+          <div class="card-header">
+              <h5 class="mb-0">ความถี่ในการซื้อ</h5>
+          </div>
+          <div class="card-body">
+              <canvas id="purchaseFrequencyChart" height="300"></canvas>
+          </div>
+      </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+      <h5 class="mb-0">แคมเปญการตลาด</h5>
+  </div>
+  <div class="card-body">
+      <form id="campaign-form">
+          <div class="row mb-3">
+              <div class="col-md-6">
+                  <label for="campaign-name" class="form-label">ชื่อแคมเปญ</label>
+                  <input type="text" class="form-control" id="campaign-name" placeholder="เช่น โปรโมชันวันเกิด, ส่วนลดลูกค้าเก่า">
+              </div>
+              <div class="col-md-6">
+                  <label for="campaign-type" class="form-label">ประเภทแคมเปญ</label>
+                  <select class="form-select" id="campaign-type">
+                      <option value="discount">ส่วนลด</option>
+                      <option value="free_gift">ของแถม</option>
+                      <option value="free_shipping">ส่งฟรี</option>
+                      <option value="buy_one_get_one">ซื้อ 1 แถม 1</option>
+                  </select>
+              </div>
+          </div>
+          
+          <div class="row mb-3">
+              <div class="col-md-6">
+                  <label for="customer-segment" class="form-label">กลุ่มลูกค้า</label>
+                  <select class="form-select" id="customer-segment">
+                      <option value="all">ทั้งหมด</option>
+                      <option value="inactive">ลูกค้าที่ไม่ได้ซื้อนาน</option>
+                      <option value="high_value">ลูกค้าที่มียอดซื้อสูง</option>
+                      <option value="new">ลูกค้าใหม่</option>
+                  </select>
+              </div>
+              <div class="col-md-6">
+                  <label for="campaign-channel" class="form-label">ช่องทางการส่ง</label>
+                  <select class="form-select" id="campaign-channel">
+                      <option value="line">Line</option>
+                      <option value="sms">SMS</option>
+                      <option value="email">Email</option>
+                  </select>
+              </div>
+          </div>
+          
+          <div class="mb-3">
+              <label for="campaign-message" class="form-label">ข้อความ</label>
+              <textarea class="form-control" id="campaign-message" rows="3" placeholder="เช่น ขอบคุณที่เป็นลูกค้าของเรา รับส่วนลด 10% สำหรับการสั่งซื้อครั้งต่อไป"></textarea>
+          </div>
+          
+          <button type="submit" class="btn btn-primary">สร้างแคมเปญ</button>
+      </form>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Show loading alert
+  document.getElementById('loading-alert').classList.remove('d-none');
+  
+  // Fetch customer analysis data
+  fetch('/api/customer_analysis')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(data => {
+      // Hide loading alert
+      document.getElementById('loading-alert').classList.add('d-none');
+      
+      // Update top customers table
+      updateTopCustomersTable(data.top_customers);
+      
+      // Update inactive customers table
+      updateInactiveCustomersTable(data.inactive_customers);
+      
+      // Create customer distribution chart
+      createDistributionChart(data.customer_distribution);
+      
+      // Create purchase frequency chart
+      createFrequencyChart(data.purchase_frequency);
+    })
+    .catch(error => {
+      console.error('Error fetching customer analysis:', error);
+      document.getElementById('loading-alert').classList.add('d-none');
+      alert('เกิดข้อผิดพลาดในการโหลดข้อมูล: ' + error.message);
+    });
+  
+  // Function to update top customers table
+  function updateTopCustomersTable(customers) {
+    const tableBody = document.getElementById('top-customers-table');
+    
+    if (customers.length === 0) {
+      tableBody.innerHTML = '<tr><td colspan="4" class="text-center">ไม่มีข้อมูลลูกค้า</td></tr>';
+      return;
+    }
+    
+    let html = '';
+    customers.forEach(customer => {
+      html += `
+        <tr>
+          <td>
+            <a href="${customer.id ? '/view_customer/' + customer.id : '#'}">${customer.name}</a>
+          </td>
+          <td>${customer.order_count}</td>
+          <td>฿${customer.total_spent.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+          <td>${customer.last_order_date || '-'}</td>
+        </tr>
+      `;
+    });
+    
+    tableBody.innerHTML = html;
+  }
+  
+  // Function to update inactive customers table
+  function updateInactiveCustomersTable(customers) {
+    const tableBody = document.getElementById('inactive-customers-table');
+    
+    if (customers.length === 0) {
+      tableBody.innerHTML = '<tr><td colspan="4" class="text-center">ไม่มีข้อมูลลูกค้าที่ไม่ได้ซื้อนาน</td></tr>';
+      return;
+    }
+    
+    let html = '';
+    customers.forEach(customer => {
+      html += `
+        <tr>
+          <td>
+            <a href="${customer.id ? '/view_customer/' + customer.id : '#'}">${customer.name}</a>
+          </td>
+          <td>${customer.last_order_date || '-'}</td>
+          <td>฿${customer.total_spent.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+          <td>
+            <button class="btn btn-sm btn-outline-primary send-promotion" data-customer-id="${customer.id}">
+              <i class="bi bi-gift me-1"></i>ส่งโปรโมชัน
+            </button>
+          </td>
+        </tr>
+      `;
+    });
+    
+    tableBody.innerHTML = html;
+    
+    // Add event listeners to promotion buttons
+    document.querySelectorAll('.send-promotion').forEach(button => {
+      button.addEventListener('click', function() {
+        const customerId = this.getAttribute('data-customer-id');
+        // Set the customer segment to inactive
+        document.getElementById('customer-segment').value = 'inactive';
+        // Scroll to campaign form
+        document.getElementById('campaign-form').scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+  }
+  
+  // Function to create customer distribution chart
+  function createDistributionChart(distributionData) {
+    const ctx = document.getElementById('customerDistributionChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: ['ลูกค้าประจำ', 'ลูกค้าทั่วไป', 'ลูกค้าใหม่', 'ลูกค้าที่ไม่ได้ซื้อนาน'],
+        datasets: [{
+          data: distributionData,
+          backgroundColor: [
+            '#4e73df',
+            '#1cc88a',
+            '#36b9cc',
+            '#f6c23e'
+          ],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom'
+          }
+        }
+      }
+    });
+  }
+  
+  // Function to create purchase frequency chart
+  function createFrequencyChart(frequencyData) {
+    const ctx = document.getElementById('purchaseFrequencyChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['1 ครั้ง', '2-3 ครั้ง', '4-6 ครั้ง', '7-12 ครั้ง', 'มากกว่า 12 ครั้ง'],
+        datasets: [{
+          label: 'จำนวนลูกค้า',
+          data: frequencyData,
+          backgroundColor: '#4e73df',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              precision: 0
+            }
+          }
+        }
+      }
+    });
+  }
+  
+  // Handle campaign form submission
+  document.getElementById('campaign-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const campaignData = {
+      name: document.getElementById('campaign-name').value,
+      type: document.getElementById('campaign-type').value,
+      segment: document.getElementById('customer-segment').value,
+      channel: document.getElementById('campaign-channel').value,
+      message: document.getElementById('campaign-message').value
+    };
+    
+    // Validate form
+    if (!campaignData.name || !campaignData.message) {
+      alert('กรุณากรอกชื่อแคมเปญและข้อความ');
+      return;
+    }
+    
+    // In a real application, you would send this data to the server
+    console.log('Campaign data:', campaignData);
+    alert('สร้างแคมเปญสำเร็จ!');
+    
+    // Reset form
+    this.reset();
+  });
+});
+</script>
+{% endblock %}

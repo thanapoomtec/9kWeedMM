@@ -1,0 +1,304 @@
+-- MariaDB dump 10.19  Distrib 10.4.32-MariaDB, for Win64 (AMD64)
+--
+-- Host: localhost    Database: marbo9k
+-- ------------------------------------------------------
+-- Server version	10.4.32-MariaDB
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `activity_log`
+--
+
+DROP TABLE IF EXISTS `activity_log`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `activity_log` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) DEFAULT NULL,
+  `action` varchar(100) NOT NULL,
+  `entity_type` varchar(50) DEFAULT NULL,
+  `entity_id` int(11) DEFAULT NULL,
+  `details` text DEFAULT NULL,
+  `ip_address` varchar(50) DEFAULT NULL,
+  `timestamp` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `activity_log_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `activity_log`
+--
+
+LOCK TABLES `activity_log` WRITE;
+/*!40000 ALTER TABLE `activity_log` DISABLE KEYS */;
+INSERT INTO `activity_log` VALUES (1,1,'login',NULL,NULL,NULL,'127.0.0.1','2025-04-03 21:28:12'),(2,1,'add_product','product',1,'Added product: Marbo 9k STRAWBERRY','127.0.0.1','2025-04-03 21:29:48'),(3,1,'delete_product','product',1,'Deleted product: Marbo 9k STRAWBERRY','127.0.0.1','2025-04-03 21:30:02'),(4,1,'login',NULL,NULL,NULL,'127.0.0.1','2025-04-03 21:37:02'),(5,1,'add_product','product',2,'Added product: Marbo 9k STRAWBERRY','127.0.0.1','2025-04-03 21:38:20'),(6,1,'login',NULL,NULL,NULL,'127.0.0.1','2025-04-03 21:40:14'),(7,1,'edit_product','product',2,'Edited product: Marbo 9k STRAWBERRY','127.0.0.1','2025-04-03 21:42:10'),(8,1,'login',NULL,NULL,NULL,'127.0.0.1','2025-04-03 21:45:56'),(9,1,'edit_product','product',2,'Edited product: Marbo 9k STRAWBERRY','127.0.0.1','2025-04-03 21:48:20'),(10,1,'edit_product','product',2,'Edited product: Marbo 9k STRAWBERRY','127.0.0.1','2025-04-03 21:48:36'),(11,1,'login',NULL,NULL,NULL,'127.0.0.1','2025-04-03 21:49:09'),(12,1,'login',NULL,NULL,NULL,'127.0.0.1','2025-04-03 21:49:09'),(13,1,'login',NULL,NULL,NULL,'127.0.0.1','2025-04-03 21:55:04'),(14,1,'edit_product','product',2,'Edited product: Marbo 9k STRAWBERRY','127.0.0.1','2025-04-03 21:55:16'),(15,1,'add_order','order',2,'Added order for customer: asd','127.0.0.1','2025-04-03 21:55:39'),(16,1,'login',NULL,NULL,NULL,'127.0.0.1','2025-04-03 22:24:31'),(17,1,'add_user','user',2,'Added user: bishak','127.0.0.1','2025-04-03 22:30:17'),(18,1,'edit_user','user',2,'Edited user: bishak','127.0.0.1','2025-04-03 22:30:24'),(19,1,'add_user','user',3,'Added user: dd','127.0.0.1','2025-04-03 22:30:35'),(20,1,'edit_product','product',2,'Edited product: Marbo 9k STRAWBERRY','127.0.0.1','2025-04-03 22:52:19'),(21,1,'edit_product','product',2,'Edited product: Marbo 9k STRAWBERRY','127.0.0.1','2025-04-03 22:56:17'),(22,1,'edit_product','product',2,'Edited product: Marbo 9k STRAWBERRY','127.0.0.1','2025-04-03 23:09:26'),(23,1,'add_product','product',3,'Added product: Marbo 9k STRAWBERRY PEACH','127.0.0.1','2025-04-03 23:10:38'),(24,1,'edit_product','product',2,'Edited product: Marbo 9k STRAWBERRY','127.0.0.1','2025-04-03 23:14:43'),(25,1,'backup_data',NULL,NULL,'Created backup: db_backup_20250403_231446.sql and data_export_20250403_231446.xlsx','127.0.0.1','2025-04-03 23:15:01'),(26,1,'logout',NULL,NULL,NULL,'127.0.0.1','2025-04-03 23:15:54'),(27,2,'login',NULL,NULL,NULL,'127.0.0.1','2025-04-03 23:15:57'),(28,2,'add_product','product',4,'Added product: Marbo 9k PEACH','127.0.0.1','2025-04-03 23:17:04'),(29,2,'add_product','product',5,'Added product: Marbo 9k APPLE ALOE','127.0.0.1','2025-04-03 23:17:31'),(30,2,'edit_product','product',2,'Edited product: Marbo 9k STRAWBERRY','127.0.0.1','2025-04-03 23:18:16'),(31,2,'edit_product','product',2,'Edited product: Marbo 9k STRAWBERRY','127.0.0.1','2025-04-03 23:18:40'),(32,2,'edit_product','product',2,'Edited product: Marbo 9k STRAWBERRY','127.0.0.1','2025-04-03 23:18:47'),(33,2,'edit_product','product',3,'Edited product: Marbo 9k STRAWBERRY PEACH','127.0.0.1','2025-04-03 23:18:55'),(34,2,'edit_product','product',4,'Edited product: Marbo 9k PEACH','127.0.0.1','2025-04-03 23:19:01'),(35,2,'edit_product','product',5,'Edited product: Marbo 9k APPLE ALOE','127.0.0.1','2025-04-03 23:19:06'),(36,2,'add_product','product',6,'Added product: Marbo 9k WATERMELON BUBBLEGUM','127.0.0.1','2025-04-03 23:19:34'),(37,2,'add_inventory','product',6,'Added 10 units to Marbo 9k WATERMELON BUBBLEGUM','127.0.0.1','2025-04-03 23:19:53'),(38,2,'backup_data',NULL,NULL,'Created backup: db_backup_20250403_232535.sql and data_export_20250403_232535.xlsx','127.0.0.1','2025-04-03 23:25:40');
+/*!40000 ALTER TABLE `activity_log` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `customer`
+--
+
+DROP TABLE IF EXISTS `customer`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `customer` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `phone` varchar(20) DEFAULT NULL,
+  `address` text DEFAULT NULL,
+  `line_id` varchar(50) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `customer`
+--
+
+LOCK TABLES `customer` WRITE;
+/*!40000 ALTER TABLE `customer` DISABLE KEYS */;
+INSERT INTO `customer` VALUES (1,'asd','asdasd','asdasd',NULL,'2025-04-03 21:30:26'),(2,'asdasd','asd','asdasd',NULL,'2025-04-03 22:36:38'),(3,'jak papho','0877895489','เทสเทส',NULL,'2025-04-03 23:22:13'),(4,'หนองปลา หวาย','0879875487','asdasd',NULL,'2025-04-03 23:32:10');
+/*!40000 ALTER TABLE `customer` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `inventory_entry`
+--
+
+DROP TABLE IF EXISTS `inventory_entry`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `inventory_entry` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `product_id` int(11) NOT NULL,
+  `quantity` int(11) NOT NULL,
+  `date` datetime DEFAULT NULL,
+  `notes` text DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `product_id` (`product_id`),
+  CONSTRAINT `inventory_entry_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `product` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `inventory_entry`
+--
+
+LOCK TABLES `inventory_entry` WRITE;
+/*!40000 ALTER TABLE `inventory_entry` DISABLE KEYS */;
+INSERT INTO `inventory_entry` VALUES (1,6,10,'2025-04-03 23:19:53','');
+/*!40000 ALTER TABLE `inventory_entry` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `notification`
+--
+
+DROP TABLE IF EXISTS `notification`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `notification` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) DEFAULT NULL,
+  `message` varchar(255) NOT NULL,
+  `type` varchar(50) DEFAULT NULL,
+  `related_id` int(11) DEFAULT NULL,
+  `is_read` tinyint(1) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `notification_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `notification`
+--
+
+LOCK TABLES `notification` WRITE;
+/*!40000 ALTER TABLE `notification` DISABLE KEYS */;
+INSERT INTO `notification` VALUES (1,1,'มีคำสั่งซื้อใหม่ #1 จากลูกค้า asd','new_order',1,1,'2025-04-03 21:30:26'),(2,1,'มีคำสั่งซื้อใหม่ #2 จากลูกค้า asd','new_order',2,1,'2025-04-03 21:55:39'),(3,1,'มีคำสั่งซื้อใหม่ #3 จากลูกค้า asdasd','new_order',3,1,'2025-04-03 22:36:38'),(4,2,'มีคำสั่งซื้อใหม่ #3 จากลูกค้า asdasd','new_order',3,1,'2025-04-03 22:36:38'),(5,1,'มีคำสั่งซื้อใหม่ #4 จากลูกค้า jak papho','new_order',4,0,'2025-04-03 23:22:13'),(6,2,'มีคำสั่งซื้อใหม่ #4 จากลูกค้า jak papho','new_order',4,0,'2025-04-03 23:22:13'),(7,1,'มีคำสั่งซื้อใหม่ #5 จากลูกค้า หนองปลา หวาย','new_order',5,0,'2025-04-03 23:32:10'),(8,2,'มีคำสั่งซื้อใหม่ #5 จากลูกค้า หนองปลา หวาย','new_order',5,0,'2025-04-03 23:32:10');
+/*!40000 ALTER TABLE `notification` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `order`
+--
+
+DROP TABLE IF EXISTS `order`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `order` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `customer_id` int(11) NOT NULL,
+  `order_date` datetime DEFAULT NULL,
+  `total_amount` float DEFAULT NULL,
+  `shipping_address` text DEFAULT NULL,
+  `payment_slip` varchar(200) DEFAULT NULL,
+  `payment_date` datetime DEFAULT NULL,
+  `payment_status` varchar(20) DEFAULT NULL,
+  `status` varchar(20) DEFAULT NULL,
+  `notes` text DEFAULT NULL,
+  `qr_code_path` varchar(200) DEFAULT NULL,
+  `pickup_location` varchar(500) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `customer_id` (`customer_id`),
+  CONSTRAINT `order_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customer` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `order`
+--
+
+LOCK TABLES `order` WRITE;
+/*!40000 ALTER TABLE `order` DISABLE KEYS */;
+INSERT INTO `order` VALUES (1,1,'2025-04-03 21:30:26',0,'asdasd',NULL,NULL,'pending','pending',NULL,'qrcodes\\qrcode_1.png',NULL),(2,1,'2025-04-03 21:55:39',1900,'',NULL,NULL,'pending','pending','','qrcodes\\qrcode_2.png',NULL),(3,2,'2025-04-03 22:36:38',760,'asdasd',NULL,NULL,'pending','pending',NULL,'qrcodes\\qrcode_3.png',NULL),(4,3,'2025-04-03 23:22:13',760,'เทสเทส',NULL,NULL,'pending','pending',NULL,'qrcodes\\qrcode_4.png',NULL),(5,4,'2025-04-03 23:32:10',1520,'asdasd',NULL,NULL,'pending','pending',NULL,'qrcodes\\qrcode_5.png',NULL);
+/*!40000 ALTER TABLE `order` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `order_item`
+--
+
+DROP TABLE IF EXISTS `order_item`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `order_item` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `order_id` int(11) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  `quantity` int(11) NOT NULL,
+  `price` float NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `order_id` (`order_id`),
+  KEY `product_id` (`product_id`),
+  CONSTRAINT `order_item_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `order` (`id`),
+  CONSTRAINT `order_item_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `product` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `order_item`
+--
+
+LOCK TABLES `order_item` WRITE;
+/*!40000 ALTER TABLE `order_item` DISABLE KEYS */;
+INSERT INTO `order_item` VALUES (1,2,2,5,380),(2,3,2,2,380),(3,4,2,2,380),(4,5,4,4,380);
+/*!40000 ALTER TABLE `order_item` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `product`
+--
+
+DROP TABLE IF EXISTS `product`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `product` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `flavor` varchar(100) NOT NULL,
+  `description` text DEFAULT NULL,
+  `price` float NOT NULL,
+  `cost` float NOT NULL,
+  `wholesale_price` float DEFAULT NULL,
+  `stock` int(11) DEFAULT NULL,
+  `barcode` varchar(50) DEFAULT NULL,
+  `image_path` varchar(200) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `product`
+--
+
+LOCK TABLES `product` WRITE;
+/*!40000 ALTER TABLE `product` DISABLE KEYS */;
+INSERT INTO `product` VALUES (2,'Marbo 9k','STRAWBERRY','',380,310,360,8,'','products/Marbo-Bar-9k-Strawberry.jpg_1743696566.webp','2025-04-03 21:38:20'),(3,'Marbo 9k','STRAWBERRY PEACH','',380,310,360,10,'','products/Marbo-Bar-9k-Peach-Strawberry.jpg_1743696638.webp','2025-04-03 23:10:38'),(4,'Marbo 9k','PEACH','',380,310,360,6,'','products/Marbo-Bar-9k-Peach.jpg_1743697024.webp','2025-04-03 23:17:04'),(5,'Marbo 9k','APPLE ALOE','',380,310,360,10,'','products/Marbo-Bar-9k-Apple-Aloe.jpg_1743697051.webp','2025-04-03 23:17:31'),(6,'Marbo 9k','WATERMELON BUBBLEGUM','',380,310,360,10,'','products/Marbo-Bar-9k-Watermelon-Bubblegum.jpg_1743697174.webp','2025-04-03 23:19:34');
+/*!40000 ALTER TABLE `product` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `settings`
+--
+
+DROP TABLE IF EXISTS `settings`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `settings` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_name` varchar(100) DEFAULT NULL,
+  `company_logo` varchar(200) DEFAULT NULL,
+  `company_address` text DEFAULT NULL,
+  `company_phone` varchar(20) DEFAULT NULL,
+  `company_email` varchar(100) DEFAULT NULL,
+  `low_stock_threshold` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `settings`
+--
+
+LOCK TABLES `settings` WRITE;
+/*!40000 ALTER TABLE `settings` DISABLE KEYS */;
+/*!40000 ALTER TABLE `settings` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `user`
+--
+
+DROP TABLE IF EXISTS `user`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `user` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `username` varchar(80) NOT NULL,
+  `password` varchar(200) NOT NULL,
+  `name` varchar(100) DEFAULT NULL,
+  `role` varchar(20) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `username` (`username`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `user`
+--
+
+LOCK TABLES `user` WRITE;
+/*!40000 ALTER TABLE `user` DISABLE KEYS */;
+INSERT INTO `user` VALUES (1,'admin','pbkdf2:sha256:600000$nJitox4vojzWTUte$a3f3652c647482cf1ee132c2891ea0e14c0ea9a3c70e084f8d1afbba61ced3b0',NULL,'admin','2025-04-03 21:28:07'),(2,'bishak','pbkdf2:sha256:600000$4AivrhcrUX3shdkx$0ea19f69a7da3a7eb8b72a68256ee658d07e8c8d52f3279814c281d93ae16f19','bishak weeding','admin','2025-04-03 22:30:17'),(3,'dd','pbkdf2:sha256:600000$3yIX1ol878ok18Ui$b5f199e5d6bbd35d6686ea96687e1262c860f53cb5b636b7ec4d1a198e7473fa','asdsadas','staff','2025-04-03 22:30:35');
+/*!40000 ALTER TABLE `user` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2025-04-03 23:59:32

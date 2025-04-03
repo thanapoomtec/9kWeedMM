@@ -1,0 +1,393 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">การวิเคราะห์ต้นทุนและกำไร</h1>
+  <div class="btn-toolbar mb-2 mb-md-0">
+      <a href="{{ url_for('reports') }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left me-2"></i>กลับไปยังรายงาน</a>
+  </div>
+</div>
+
+{% if sample_product %}
+<!-- Sample Product Analysis (Marbo 9k) -->
+<div class="card mb-4">
+  <div class="card-header">
+      <h5 class="mb-0">การวิเคราะห์ต้นทุนและกำไร: {{ sample_product.name }}</h5>
+  </div>
+  <div class="card-body">
+      <div class="row">
+          <div class="col-md-6">
+              <div class="table-responsive">
+                  <table class="table table-bordered">
+                      <thead class="table-light">
+                          <tr>
+                              <th>รายการ</th>
+                              <th>จำนวนเงิน (บาท)</th>
+                              <th>เปอร์เซ็นต์</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          <tr>
+                              <td>ราคาขาย</td>
+                              <td>{{ sample_product.price }}</td>
+                              <td>100%</td>
+                          </tr>
+                          <tr>
+                              <td>ต้นทุน</td>
+                              <td>{{ sample_product.cost }}</td>
+                              <td>{{ ((sample_product.cost / sample_product.price) * 100)|round(2) if sample_product.price > 0 else 0 }}%</td>
+                          </tr>
+                          <tr class="table-success">
+                              <td>กำไร</td>
+                              <td>{{ sample_product.profit }}</td>
+                              <td>{{ sample_product.profit_percentage|round(2) }}%</td>
+                          </tr>
+                      </tbody>
+                  </table>
+              </div>
+          </div>
+          <div class="col-md-6">
+              <canvas id="costProfitChart" height="250"></canvas>
+          </div>
+      </div>
+  </div>
+</div>
+{% else %}
+<div class="alert alert-info">
+    <i class="bi bi-info-circle me-2"></i>ไม่มีข้อมูลสินค้าในระบบ กรุณาเพิ่มสินค้าก่อนดูการวิเคราะห์ต้นทุนและกำไร
+</div>
+{% endif %}
+
+<!-- Overall Profit Metrics -->
+<div class="row mb-4">
+  <div class="col-md-4">
+      <div class="card text-white bg-primary h-100">
+          <div class="card-body">
+              <h5 class="card-title">มูลค่าสินค้าคงคลัง (ราคาขาย)</h5>
+              <h3 class="card-text">฿{{ '{:,.2f}'.format(total_value) }}</h3>
+          </div>
+      </div>
+  </div>
+  <div class="col-md-4">
+      <div class="card text-white bg-warning h-100">
+          <div class="card-body">
+              <h5 class="card-title">ต้นทุนสินค้าคงคลัง</h5>
+              <h3 class="card-text">฿{{ '{:,.2f}'.format(total_cost) }}</h3>
+          </div>
+      </div>
+  </div>
+  <div class="col-md-4">
+      <div class="card text-white bg-success h-100">
+          <div class="card-body">
+              <h5 class="card-title">กำไรที่คาดการณ์</h5>
+              <h3 class="card-text">฿{{ '{:,.2f}'.format(total_profit_potential) }}</h3>
+          </div>
+      </div>
+  </div>
+</div>
+
+{% if products %}
+<!-- Historical Profit Trends -->
+<div class="card mb-4">
+  <div class="card-header">
+      <h5 class="mb-0">แนวโน้มกำไรย้อนหลัง 6 เดือน</h5>
+  </div>
+  <div class="card-body">
+      <canvas id="profitTrendChart" height="300"></canvas>
+  </div>
+</div>
+
+<!-- Top Products by Profit Margin -->
+<div class="row mb-4">
+  <div class="col-md-6">
+      <div class="card h-100">
+          <div class="card-header">
+              <h5 class="mb-0">สินค้าที่มีอัตรากำไรสูงสุด</h5>
+          </div>
+          <div class="card-body">
+              {% if top_products_by_margin %}
+              <canvas id="topMarginChart" height="300"></canvas>
+              {% else %}
+              <div class="alert alert-info">ไม่มีข้อมูลสินค้าเพียงพอสำหรับการวิเคราะห์</div>
+              {% endif %}
+          </div>
+      </div>
+  </div>
+  <div class="col-md-6">
+      <div class="card h-100">
+          <div class="card-header">
+              <h5 class="mb-0">สินค้าที่มีกำไรรวมสูงสุด</h5>
+          </div>
+          <div class="card-body">
+              {% if top_products_by_total_profit %}
+              <canvas id="topProfitChart" height="300"></canvas>
+              {% else %}
+              <div class="alert alert-info">ไม่มีข้อมูลสินค้าเพียงพอสำหรับการวิเคราะห์</div>
+              {% endif %}
+          </div>
+      </div>
+  </div>
+</div>
+
+<!-- All Products Profit Analysis -->
+<div class="card">
+  <div class="card-header">
+      <h5 class="mb-0">การวิเคราะห์กำไรของสินค้าทั้งหมด</h5>
+  </div>
+  <div class="card-body">
+      <div class="table-responsive">
+          <table class="table table-striped table-sm">
+              <thead>
+                  <tr>
+                      <th>สินค้า</th>
+                      <th>รสชาติ</th>
+                      <th>ราคาขาย</th>
+                      <th>ต้นทุน</th>
+                      <th>กำไร/ชิ้น</th>
+                      <th>อัตรากำไร</th>
+                      <th>สต็อก</th>
+                      <th>กำไรรวม</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  {% for product in products %}
+                  <tr>
+                      <td>{{ product.name }}</td>
+                      <td>{{ product.flavor }}</td>
+                      <td>฿{{ '{:,.2f}'.format(product.price) }}</td>
+                      <td>฿{{ '{:,.2f}'.format(product.cost) }}</td>
+                      <td>฿{{ '{:,.2f}'.format(product.price - product.cost) }}</td>
+                      <td>{{ '{:,.2f}'.format(product.profit_margin) }}%</td>
+                      <td>{{ product.stock }}</td>
+                      <td>฿{{ '{:,.2f}'.format((product.price - product.cost) * product.stock) }}</td>
+                  </tr>
+                  {% endfor %}
+              </tbody>
+          </table>
+      </div>
+  </div>
+</div>
+{% else %}
+<div class="alert alert-info">
+    <i class="bi bi-info-circle me-2"></i>ไม่มีข้อมูลสินค้าในระบบ กรุณาเพิ่มสินค้าก่อนดูการวิเคราะห์ต้นทุนและกำไร
+</div>
+{% endif %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  {% if sample_product %}
+  // Cost vs Profit Pie Chart for Sample Product
+  const costProfitCtx = document.getElementById('costProfitChart').getContext('2d');
+  new Chart(costProfitCtx, {
+      type: 'pie',
+      data: {
+          labels: ['ต้นทุน ({{ sample_product.cost }} บาท)', 'กำไร ({{ sample_product.profit }} บาท)'],
+          datasets: [{
+              data: [{{ sample_product.cost }}, {{ sample_product.profit }}],
+              backgroundColor: ['#ffc107', '#28a745'],
+              borderWidth: 1
+          }]
+      },
+      options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+              legend: {
+                  position: 'bottom'
+              },
+              title: {
+                  display: true,
+                  text: 'สัดส่วนต้นทุนและกำไร (ราคาขาย {{ sample_product.price }} บาท)',
+                  font: {
+                      size: 16
+                  }
+              },
+              tooltip: {
+                  callbacks: {
+                      label: function(context) {
+                          const value = context.raw;
+                          const total = {{ sample_product.price }};
+                          const percentage = ((value / total) * 100).toFixed(2);
+                          return `${context.label}: ${percentage}%`;
+                      }
+                  }
+              }
+          }
+      }
+  });
+  {% endif %}
+
+  {% if products and months %}
+  // Historical Profit Trend Chart
+  const profitTrendCtx = document.getElementById('profitTrendChart').getContext('2d');
+  new Chart(profitTrendCtx, {
+      type: 'line',
+      data: {
+          labels: {{ months|tojson }},
+          datasets: [
+              {
+                  label: 'รายได้',
+                  data: {{ revenue_data|tojson }},
+                  borderColor: '#007bff',
+                  backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                  borderWidth: 2,
+                  fill: true
+              },
+              {
+                  label: 'ต้นทุน',
+                  data: {{ cost_data|tojson }},
+                  borderColor: '#ffc107',
+                  backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                  borderWidth: 2,
+                  fill: true
+              },
+              {
+                  label: 'กำไร',
+                  data: {{ profit_data|tojson }},
+                  borderColor: '#28a745',
+                  backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                  borderWidth: 3,
+                  fill: true
+              }
+          ]
+      },
+      options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+              y: {
+                  beginAtZero: true,
+                  title: {
+                      display: true,
+                      text: 'จำนวนเงิน (บาท)'
+                  }
+              },
+              x: {
+                  title: {
+                      display: true,
+                      text: 'เดือน'
+                  }
+              }
+          },
+          plugins: {
+              legend: {
+                  position: 'top'
+              },
+              title: {
+                  display: true,
+                  text: 'แนวโน้มรายได้ ต้นทุน และกำไร',
+                  font: {
+                      size: 16
+                  }
+              }
+          }
+      }
+  });
+  {% endif %}
+
+  {% if top_products_by_margin %}
+  // Top Products by Profit Margin
+  const topMarginCtx = document.getElementById('topMarginChart').getContext('2d');
+  new Chart(topMarginCtx, {
+      type: 'bar',
+      data: {
+          labels: [
+              {% for product in top_products_by_margin %}
+              "{{ product.name }} ({{ product.flavor }})",
+              {% endfor %}
+          ],
+          datasets: [{
+              label: 'อัตรากำไร (%)',
+              data: [
+                  {% for product in top_products_by_margin %}
+                  {{ product.profit_margin|round(2) }},
+                  {% endfor %}
+              ],
+              backgroundColor: 'rgba(40, 167, 69, 0.7)',
+              borderColor: 'rgba(40, 167, 69, 1)',
+              borderWidth: 1
+          }]
+      },
+      options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          indexAxis: 'y',
+          scales: {
+              x: {
+                  beginAtZero: true,
+                  title: {
+                      display: true,
+                      text: 'อัตรากำไร (%)'
+                  }
+              }
+          },
+          plugins: {
+              legend: {
+                  display: false
+              },
+              title: {
+                  display: true,
+                  text: 'สินค้าที่มีอัตรากำไรสูงสุด',
+                  font: {
+                      size: 16
+                  }
+              }
+          }
+      }
+  });
+  {% endif %}
+
+  {% if top_products_by_total_profit %}
+  // Top Products by Total Profit
+  const topProfitCtx = document.getElementById('topProfitChart').getContext('2d');
+  new Chart(topProfitCtx, {
+      type: 'bar',
+      data: {
+          labels: [
+              {% for product in top_products_by_total_profit %}
+              "{{ product.name }} ({{ product.flavor }})",
+              {% endfor %}
+          ],
+          datasets: [{
+              label: 'กำไรรวม (บาท)',
+              data: [
+                  {% for product in top_products_by_total_profit %}
+                  {{ ((product.price - product.cost) * product.stock)|round(2) }},
+                  {% endfor %}
+              ],
+              backgroundColor: 'rgba(0, 123, 255, 0.7)',
+              borderColor: 'rgba(0, 123, 255, 1)',
+              borderWidth: 1
+          }]
+      },
+      options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          indexAxis: 'y',
+          scales: {
+              x: {
+                  beginAtZero: true,
+                  title: {
+                      display: true,
+                      text: 'กำไรรวม (บาท)'
+                  }
+              }
+          },
+          plugins: {
+              legend: {
+                  display: false
+              },
+              title: {
+                  display: true,
+                  text: 'สินค้าที่มีกำไรรวมสูงสุด (กำไร × สต็อก)',
+                  font: {
+                      size: 16
+                  }
+              }
+          }
+      }
+  });
+  {% endif %}
+});
+</script>
+{% endblock %}
+

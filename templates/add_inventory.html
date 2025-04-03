@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">เพิ่มสต็อกสินค้า</h1>
+  <div class="btn-toolbar mb-2 mb-md-0">
+      <a href="{{ url_for('inventory') }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left me-2"></i>กลับไปยังสต็อกสินค้า</a>
+  </div>
+</div>
+<div class="card">
+  <div class="card-body">
+      <form method="POST" id="inventoryForm">
+          <div class="mb-3">
+              <label for="name" class="form-label">ชื่อสินค้า</label>
+              <select class="form-select" id="name" name="name" required>
+                  <option value="Marbo 9K" selected>Marbo 9K</option>
+              </select>
+          </div>
+          <div class="mb-3">
+              <label for="flavor" class="form-label">รสชาติ</label>
+              <select class="form-select" id="flavor" name="flavor" required>
+                  <option value="">เลือกรสชาติ</option>
+                  <option value="APPLE ALOE">APPLE ALOE</option>
+                  <option value="BLUE ICE">BLUE ICE</option>
+                  <option value="COLA">COLA</option>
+                  <option value="DOUBLE MINT">DOUBLE MINT</option>
+                  <option value="GRAPE ALOE">GRAPE ALOE</option>
+                  <option value="GRAPE LYCHEE">GRAPE LYCHEE</option>
+                  <option value="GRAPE MIXBERRY">GRAPE MIXBERRY</option>
+                  <option value="ORANGE SOUR">ORANGE SOUR</option>
+                  <option value="PEACH">PEACH</option>
+                  <option value="STRAWBERRY PEACH">STRAWBERRY PEACH</option>
+                  <option value="PINKBERRY">PINKBERRY</option>
+                  <option value="RAINBOW CANDY">RAINBOW CANDY</option>
+                  <option value="SOUR GUMMY">SOUR GUMMY</option>
+                  <option value="SPARKLING LEMON">SPARKLING LEMON</option>
+                  <option value="STRAWBERRY">STRAWBERRY</option>
+                  <option value="WATERMELON BUBBLEGUM">WATERMELON BUBBLEGUM</option>
+                  <option value="WATERMELON">WATERMELON</option>
+              </select>
+          </div>
+          <div class="row mb-3">
+              <div class="col-md-4">
+                  <label for="price" class="form-label">ราคาขาย (บาท)</label>
+                  <input type="number" class="form-control" id="price" name="price" value="380" step="0.01" min="0" required>
+              </div>
+              <div class="col-md-4">
+                  <label for="cost" class="form-label">ต้นทุน (บาท)</label>
+                  <input type="number" class="form-control" id="cost" name="cost" value="310" step="0.01" min="0" required>
+              </div>
+              <div class="col-md-4">
+                  <label for="wholesale_price" class="form-label">ราคาขายส่ง (บาท)</label>
+                  <input type="number" class="form-control" id="wholesale_price" name="wholesale_price" value="350" step="0.01" min="0">
+              </div>
+          </div>
+          <div class="row mb-3">
+              <div class="col-md-4">
+                  <label for="quantity" class="form-label">จำนวน</label>
+                  <input type="number" class="form-control" id="quantity" name="quantity" min="1" value="1" required>
+              </div>
+              <div class="col-md-4">
+                  <label for="profit" class="form-label">กำไรต่อชิ้น</label>
+                  <input type="text" class="form-control" id="profit" readonly value="70">
+              </div>
+              <div class="col-md-4">
+                  <label for="profit_percentage" class="form-label">เปอร์เซ็นต์กำไร</label>
+                  <input type="text" class="form-control" id="profit_percentage" readonly value="18.42%">
+              </div>
+          </div>
+          <div class="row mb-3">
+              <div class="col-md-6">
+                  <label for="total_cost" class="form-label">ต้นทุนรวม</label>
+                  <input type="text" class="form-control" id="total_cost" readonly value="310">
+              </div>
+              <div class="col-md-6">
+                  <label for="total_profit" class="form-label">กำไรรวม</label>
+                  <input type="text" class="form-control" id="total_profit" readonly value="70">
+              </div>
+          </div>
+          <div class="mb-3">
+              <label for="notes" class="form-label">หมายเหตุ</label>
+              <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">บันทึกการเพิ่มสต็อก</button>
+      </form>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Get form elements
+    const priceInput = document.getElementById('price');
+    const costInput = document.getElementById('cost');
+    const quantityInput = document.getElementById('quantity');
+    const profitInput = document.getElementById('profit');
+    const profitPercentageInput = document.getElementById('profit_percentage');
+    const totalCostInput = document.getElementById('total_cost');
+    const totalProfitInput = document.getElementById('total_profit');
+    const wholesalePriceInput = document.getElementById('wholesale_price');
+    
+    // Function to calculate profit
+    function calculateProfit() {
+        const price = parseFloat(priceInput.value) || 0;
+        const cost = parseFloat(costInput.value) || 0;
+        const quantity = parseInt(quantityInput.value) || 0;
+        
+        // Calculate profit per unit
+        const profit = price - cost;
+        profitInput.value = profit.toFixed(2);
+        
+        // Calculate profit percentage
+        const profitPercentage = price > 0 ? (profit / price) * 100 : 0;
+        profitPercentageInput.value = profitPercentage.toFixed(2) + '%';
+        
+        // Calculate totals
+        const totalCost = cost * quantity;
+        const totalProfit = profit * quantity;
+        
+        totalCostInput.value = totalCost.toFixed(2);
+        totalProfitInput.value = totalProfit.toFixed(2);
+    }
+    
+    // Add event listeners to inputs
+    priceInput.addEventListener('input', calculateProfit);
+    costInput.addEventListener('input', calculateProfit);
+    quantityInput.addEventListener('input', calculateProfit);
+    
+    // Initial calculation
+    calculateProfit();
+});
+</script>
+{% endblock %}
+

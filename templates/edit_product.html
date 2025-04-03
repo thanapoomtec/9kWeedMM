@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">แก้ไขสินค้า</h1>
+  <div class="btn-toolbar mb-2 mb-md-0">
+      <a href="{{ url_for('products') }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left me-2"></i>กลับไปยังรายการสินค้า</a>
+  </div>
+</div>
+<div class="card">
+  <div class="card-body">
+      <form method="POST" enctype="multipart/form-data" id="editProductForm">
+          <div class="row mb-3">
+              <div class="col-md-6">
+                  <label for="name" class="form-label">ชื่อสินค้า</label>
+                  <input type="text" class="form-control" id="name" name="name" value="{{ product.name }}" required>
+              </div>
+              <div class="col-md-6">
+                  <label for="flavor" class="form-label">รสชาติ</label>
+                  <input type="text" class="form-control" id="flavor" name="flavor" value="{{ product.flavor }}" required>
+              </div>
+          </div>
+          <div class="mb-3">
+              <label for="description" class="form-label">รายละเอียด</label>
+              <textarea class="form-control" id="description" name="description" rows="3">{{ product.description or '' }}</textarea>
+          </div>
+          <div class="row mb-3">
+              <div class="col-md-3">
+                  <label for="price" class="form-label">ราคาขาย (บาท)</label>
+                  <input type="number" class="form-control" id="price" name="price" value="{{ product.price }}" min="0" step="0.01" required>
+              </div>
+              <div class="col-md-3">
+                  <label for="cost" class="form-label">ต้นทุน (บาท)</label>
+                  <input type="number" class="form-control" id="cost" name="cost" value="{{ product.cost }}" min="0" step="0.01" required>
+              </div>
+              <div class="col-md-3">
+                  <label for="wholesale_price" class="form-label">ราคาขายส่ง (บาท)</label>
+                  <input type="number" class="form-control" id="wholesale_price" name="wholesale_price" value="{{ product.wholesale_price or '' }}" min="0" step="0.01">
+              </div>
+              <div class="col-md-3">
+                  <label for="stock" class="form-label">จำนวนในสต็อก</label>
+                  <input type="number" class="form-control" id="stock" name="stock" value="{{ product.stock }}" min="0" required>
+              </div>
+          </div>
+          <div class="row mb-3">
+              <div class="col-md-4">
+                  <label for="profit" class="form-label">กำไรต่อชิ้น</label>
+                  <input type="text" class="form-control" id="profit" readonly value="{{ product.price - product.cost }}">
+              </div>
+              <div class="col-md-4">
+                  <label for="profit_percentage" class="form-label">เปอร์เซ็นต์กำไร</label>
+                  <input type="text" class="form-control" id="profit_percentage" readonly value="{{ '{:.2f}'.format(product.profit_margin) }}%">
+              </div>
+              <div class="col-md-4">
+                  <label for="wholesale_profit" class="form-label">กำไรขายส่ง</label>
+                  <input type="text" class="form-control" id="wholesale_profit" readonly value="{{ product.wholesale_price - product.cost if product.wholesale_price else '' }}">
+              </div>
+          </div>
+          <div class="mb-3">
+              <label for="barcode" class="form-label">บาร์โค้ด</label>
+              <input type="text" class="form-control" id="barcode" name="barcode" value="{{ product.barcode or '' }}" placeholder="ป้อนบาร์โค้ดสินค้า (ถ้ามี)">
+          </div>
+          <div class="mb-3">
+              <label for="image" class="form-label">รูปภาพสินค้า</label>
+              {% if product.image_path %}
+              <div class="mb-2">
+                  <img src="{{ url_for('static', filename=product.image_path.replace('\\', '/')) }}" class="img-thumbnail" style="max-width: 200px;" alt="{{ product.name }} {{ product.flavor }}"
+                       onerror="this.onerror=null; this.src='data:image/svg+xml;charset=UTF-8,%3Csvg width=\'200\' height=\'200\' xmlns=\'http://www.w3.org/2000/svg\' role=\'img\' aria-label=\'Placeholder\' preserveAspectRatio=\'xMidYMid slice\' focusable=\'false\'%3E%3Crect width=\'100%\' height=\'100%\' fill=\'%236c757d\'/%3E%3Ctext x=\'50%\' y=\'50%\' fill=\'%23dee2e6\' dy=\'.3em\' text-anchor=\'middle\'%3E{{ product.name }} {{ product.flavor }}%3C/text%3E%3C/svg%3E';">
+              </div>
+              {% endif %}
+              <input type="file" class="form-control" id="image" name="image" accept="image/jpeg,image/png,image/gif,image/webp">
+              <div class="form-text">อัปโหลดรูปภาพใหม่เพื่อแทนที่ (ไม่จำเป็น, รองรับ JPG, PNG, GIF, WEBP)</div>
+              <div id="image-preview" class="mt-2 d-none">
+                  <p>ตัวอย่างรูปภาพใหม่:</p>
+                  <img id="preview-img" src="#" alt="ตัวอย่างรูปภาพ" class="img-thumbnail" style="max-width: 200px;">
+              </div>
+              <div id="upload-error" class="alert alert-danger mt-2 d-none">
+                  เกิดข้อผิดพลาดในการอัปโหลดรูปภาพ กรุณาตรวจสอบขนาดและประเภทของไฟล์
+              </div>
+          </div>
+          <button type="submit" class="btn btn-primary">บันทึกการเปลี่ยนแปลง</button>
+      </form>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Get form elements
+    const priceInput = document.getElementById('price');
+    const costInput = document.getElementById('cost');
+    const wholesalePriceInput = document.getElementById('wholesale_price');
+    const profitInput = document.getElementById('profit');
+    const profitPercentageInput = document.getElementById('profit_percentage');
+    const wholesaleProfitInput = document.getElementById('wholesale_profit');
+    
+    // Function to calculate profit
+    function calculateProfit() {
+        const price = parseFloat(priceInput.value) || 0;
+        const cost = parseFloat(costInput.value) || 0;
+        const wholesalePrice = parseFloat(wholesalePriceInput.value) || 0;
+        
+        // Calculate profit per unit
+        const profit = price - cost;
+        profitInput.value = profit.toFixed(2);
+        
+        // Calculate profit percentage
+        const profitPercentage = price > 0 ? (profit / price) * 100 : 0;
+        profitPercentageInput.value = profitPercentage.toFixed(2) + '%';
+        
+        // Calculate wholesale profit
+        if (wholesalePrice > 0) {
+            const wholesaleProfit = wholesalePrice - cost;
+            wholesaleProfitInput.value = wholesaleProfit.toFixed(2);
+        } else {
+            wholesaleProfitInput.value = '';
+        }
+    }
+    
+    // Add event listeners to inputs
+    priceInput.addEventListener('input', calculateProfit);
+    costInput.addEventListener('input', calculateProfit);
+    wholesalePriceInput.addEventListener('input', calculateProfit);
+    
+    // Initial calculation
+    calculateProfit();
+
+    const imageInput = document.getElementById('image');
+    const imagePreview = document.getElementById('image-preview');
+    const previewImg = document.getElementById('preview-img');
+    const uploadError = document.getElementById('upload-error');
+
+    imageInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            const file = this.files[0];
+            // ตรวจสอบประเภทไฟล์
+            if (!file.type.match('image/(jpeg|png|gif|webp)')) {
+                uploadError.classList.remove('d-none');
+                uploadError.textContent = 'กรุณาอัปโหลดไฟล์รูปภาพเท่านั้น (JPG, PNG, GIF, WEBP)';
+                imagePreview.classList.add('d-none');
+                this.value = ''; // Clear the input
+                return;
+            }
+            
+            // ตรวจสอบขนาดไฟล์ (ไม่เกิน 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                uploadError.classList.remove('d-none');
+                uploadError.textContent = 'ขนาดไฟล์ต้องไม่เกิน 5MB';
+                imagePreview.classList.add('d-none');
+                this.value = ''; // Clear the input
+                return;
+            }
+            
+            uploadError.classList.add('d-none');
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImg.src = e.target.result;
+                imagePreview.classList.remove('d-none');
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+});
+</script>
+{% endblock %}
+

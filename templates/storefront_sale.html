@@ -1,0 +1,331 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4">
+  <div class="card shadow">
+      <div class="card-header bg-primary text-white">
+          <h2 class="mb-0"><i class="bi bi-shop me-2"></i>การขายหน้าร้าน (Manual)</h2>
+      </div>
+      <div class="card-body">
+          <form method="POST" action="{{ url_for('storefront_sale') }}" id="storefront-form">
+              <div class="row">
+                  <!-- ข้อมูลลูกค้าและการชำระเงิน -->
+                  <div class="col-md-4">
+                      <div class="card mb-4">
+                          <div class="card-header bg-light">
+                              <h4 class="mb-0"><i class="bi bi-person me-2"></i>ข้อมูลลูกค้า</h4>
+                          </div>
+                          <div class="card-body">
+                              <div class="mb-3">
+                                  <label for="customer_name" class="form-label fw-bold">ชื่อลูกค้า</label>
+                                  <div class="input-group">
+                                      <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                      <input type="text" class="form-control" id="customer_name" name="customer_name" placeholder="Walk-in Customer" value="Walk-in Customer">
+                                  </div>
+                              </div>
+                              <div class="mb-3">
+                                  <label for="customer_phone" class="form-label fw-bold">เบอร์โทรศัพท์ (ถ้ามี)</label>
+                                  <div class="input-group">
+                                      <span class="input-group-text"><i class="bi bi-phone"></i></span>
+                                      <input type="text" class="form-control" id="customer_phone" name="customer_phone">
+                                  </div>
+                              </div>
+                              <div class="mb-3">
+                                  <label for="payment_method" class="form-label fw-bold">วิธีชำระเงิน</label>
+                                  <div class="d-flex">
+                                      <div class="form-check me-3">
+                                          <input class="form-check-input" type="radio" name="payment_method" id="cash" value="cash" checked>
+                                          <label class="form-check-label" for="cash">
+                                              <i class="bi bi-cash me-1"></i>เงินสด
+                                          </label>
+                                      </div>
+                                      <div class="form-check me-3">
+                                          <input class="form-check-input" type="radio" name="payment_method" id="card" value="card">
+                                          <label class="form-check-label" for="card">
+                                              <i class="bi bi-credit-card me-1"></i>บัตรเครดิต/เดบิต
+                                          </label>
+                                      </div>
+                                      <div class="form-check">
+                                          <input class="form-check-input" type="radio" name="payment_method" id="transfer" value="transfer">
+                                          <label class="form-check-label" for="transfer">
+                                              <i class="bi bi-bank me-1"></i>โอนเงิน
+                                          </label>
+                                      </div>
+                                  </div>
+                              </div>
+                              <div class="mb-3">
+                                  <label for="notes" class="form-label fw-bold">หมายเหตุ</label>
+                                  <div class="input-group">
+                                      <span class="input-group-text"><i class="bi bi-sticky"></i></span>
+                                      <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      
+                      <!-- Order Summary Card -->
+                      <div class="card">
+                          <div class="card-header bg-light">
+                              <h4 class="mb-0"><i class="bi bi-receipt me-2"></i>สรุปการขาย</h4>
+                          </div>
+                          <div class="card-body">
+                              <div class="d-flex justify-content-between mb-2">
+                                  <span>จำนวนรายการ:</span>
+                                  <span id="total-items">0 รายการ</span>
+                              </div>
+                              <div class="d-flex justify-content-between mb-2">
+                                  <span>จำนวนชิ้น:</span>
+                                  <span id="total-quantity">0 ชิ้น</span>
+                              </div>
+                              <div class="d-flex justify-content-between mb-3">
+                                  <span class="fw-bold">ยอดรวม:</span>
+                                  <span class="fw-bold text-primary" id="total-amount">฿0.00</span>
+                              </div>
+                              <div class="d-grid">
+                                  <button type="submit" class="btn btn-success btn-lg">
+                                      <i class="bi bi-check-circle me-2"></i>บันทึกการขาย
+                                  </button>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+
+                  <!-- รายการสินค้า -->
+                  <div class="col-md-8">
+                      <div class="card">
+                          <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                              <h4 class="mb-0"><i class="bi bi-cart me-2"></i>รายการสินค้า</h4>
+                              <div>
+                                  <button type="button" class="btn btn-sm btn-primary" id="add-product">
+                                      <i class="bi bi-plus me-1"></i>เพิ่มสินค้า
+                                  </button>
+                                  <button type="button" class="btn btn-sm btn-outline-danger" id="clear-all">
+                                      <i class="bi bi-trash me-1"></i>ล้างทั้งหมด
+                                  </button>
+                              </div>
+                          </div>
+                          <div class="card-body">
+                              <div class="mb-3">
+                                  <div class="input-group">
+                                      <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                      <input type="text" class="form-control" id="product-search" placeholder="ค้นหาสินค้า...">
+                                  </div>
+                              </div>
+                              <div id="product-list">
+                                  <div class="row mb-3 product-item align-items-center">
+                                      <div class="col-md-6">
+                                          <label class="form-label small">สินค้า</label>
+                                          <select class="form-select product-select" name="product_id[]">
+                                              <option value="">-- เลือกสินค้า --</option>
+                                              {% for product in products %}
+                                              <option value="{{ product.id }}" data-price="{{ product.price }}" data-stock="{{ product.stock }}">
+                                                  {{ product.name }} ({{ product.flavor }}) - คงเหลือ: {{ product.stock }}
+                                              </option>
+                                              {% endfor %}
+                                          </select>
+                                      </div>
+                                      <div class="col-md-2">
+                                          <label class="form-label small">จำนวน</label>
+                                          <input type="number" class="form-control quantity-input" name="quantity[]" min="1" value="1" placeholder="จำนวน">
+                                      </div>
+                                      <div class="col-md-2">
+                                          <label class="form-label small">ราคา</label>
+                                          <input type="text" class="form-control item-price" readonly value="฿0.00">
+                                      </div>
+                                      <div class="col-md-2">
+                                          <label class="form-label small">&nbsp;</label>
+                                          <button type="button" class="btn btn-outline-danger btn-sm w-100 remove-product">
+                                              <i class="bi bi-trash me-1"></i>ลบ
+                                          </button>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </form>
+      </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      // อัพเดทจำนวนรายการสินค้าและยอดรวม
+      function updateOrderSummary() {
+          const items = document.querySelectorAll('.product-item');
+          let totalItems = 0;
+          let totalQuantity = 0;
+          let totalAmount = 0;
+          
+          items.forEach(item => {
+              const select = item.querySelector('.product-select');
+              const quantity = item.querySelector('.quantity-input');
+              
+              if (select.value) {
+                  totalItems++;
+                  const itemQuantity = parseInt(quantity.value) || 0;
+                  totalQuantity += itemQuantity;
+                  
+                  const price = parseFloat(select.options[select.selectedIndex].dataset.price) || 0;
+                  totalAmount += price * itemQuantity;
+              }
+          });
+          
+          document.getElementById('total-items').textContent = `${totalItems} รายการ`;
+          document.getElementById('total-quantity').textContent = `${totalQuantity} ชิ้น`;
+          document.getElementById('total-amount').textContent = `฿${totalAmount.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+      }
+      
+      // อัพเดทราคาสินค้าเมื่อเลือกสินค้า
+      function updateItemPrice(item) {
+          const select = item.querySelector('.product-select');
+          const quantity = item.querySelector('.quantity-input');
+          const priceDisplay = item.querySelector('.item-price');
+          
+          if (select.value) {
+              const price = parseFloat(select.options[select.selectedIndex].dataset.price) || 0;
+              const itemQuantity = parseInt(quantity.value) || 0;
+              const totalPrice = price * itemQuantity;
+              priceDisplay.value = `฿${totalPrice.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+          } else {
+              priceDisplay.value = '฿0.00';
+          }
+          
+          updateOrderSummary();
+      }
+      
+      // ตรวจสอบสต็อกสินค้า
+      function checkStock(item) {
+          const select = item.querySelector('.product-select');
+          const quantity = item.querySelector('.quantity-input');
+          
+          if (select.value) {
+              const stock = parseInt(select.options[select.selectedIndex].dataset.stock) || 0;
+              const maxQuantity = stock;
+              
+              if (parseInt(quantity.value) > maxQuantity) {
+                  quantity.value = maxQuantity;
+                  alert(`สินค้านี้มีในสต็อกเพียง ${maxQuantity} ชิ้น`);
+              }
+          }
+          
+          updateItemPrice(item);
+      }
+
+      // เพิ่มสินค้า
+      document.getElementById('add-product').addEventListener('click', function() {
+          const productList = document.getElementById('product-list');
+          const newItem = productList.querySelector('.product-item').cloneNode(true);
+          
+          // รีเซ็ตค่า
+          newItem.querySelector('.product-select').value = '';
+          newItem.querySelector('.quantity-input').value = '1';
+          newItem.querySelector('.item-price').value = '฿0.00';
+          
+          // เพิ่ม event listeners
+          addItemEventListeners(newItem);
+          
+          productList.appendChild(newItem);
+          updateOrderSummary();
+          
+          // เลื่อนไปที่รายการใหม่
+          newItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+      
+      // ล้างรายการทั้งหมด
+      document.getElementById('clear-all').addEventListener('click', function() {
+          if (confirm('คุณแน่ใจหรือไม่ที่ต้องการล้างรายการทั้งหมด?')) {
+              const productList = document.getElementById('product-list');
+              const firstItem = productList.querySelector('.product-item');
+              
+              // ล้างทุกรายการยกเว้นรายการแรก
+              while (productList.children.length > 1) {
+                  productList.removeChild(productList.lastChild);
+              }
+              
+              // รีเซ็ตรายการแรก
+              firstItem.querySelector('.product-select').value = '';
+              firstItem.querySelector('.quantity-input').value = '1';
+              firstItem.querySelector('.item-price').value = '฿0.00';
+              
+              updateOrderSummary();
+          }
+      });
+      
+      // ค้นหาสินค้า
+      document.getElementById('product-search').addEventListener('input', function() {
+          const searchTerm = this.value.toLowerCase();
+          const selects = document.querySelectorAll('.product-select');
+          
+          selects.forEach(select => {
+              const options = select.querySelectorAll('option:not(:first-child)');
+              
+              options.forEach(option => {
+                  const text = option.textContent.toLowerCase();
+                  if (text.includes(searchTerm)) {
+                      option.style.display = '';
+                  } else {
+                      option.style.display = 'none';
+                  }
+              });
+          });
+      });
+      
+      // เพิ่ม event listeners ให้กับรายการสินค้า
+      function addItemEventListeners(item) {
+          const select = item.querySelector('.product-select');
+          const quantity = item.querySelector('.quantity-input');
+          const removeBtn = item.querySelector('.remove-product');
+          
+          select.addEventListener('change', function() {
+              checkStock(item);
+          });
+          
+          quantity.addEventListener('input', function() {
+              checkStock(item);
+          });
+          
+          removeBtn.addEventListener('click', function() {
+              const items = document.querySelectorAll('.product-item');
+              if (items.length > 1) {
+                  item.remove();
+                  updateOrderSummary();
+              } else {
+                  // แสดง alert ถ้าพยายามลบรายการสุดท้าย
+                  alert('ต้องมีอย่างน้อย 1 รายการสินค้า');
+                  // รีเซ็ตรายการแทนการลบ
+                  select.value = '';
+                  quantity.value = '1';
+                  updateItemPrice(item);
+              }
+          });
+      }
+      
+      // ตรวจสอบฟอร์มก่อนส่ง
+      document.getElementById('storefront-form').addEventListener('submit', function(e) {
+          const selects = document.querySelectorAll('.product-select');
+          let hasProducts = false;
+          
+          selects.forEach(select => {
+              if (select.value) {
+                  hasProducts = true;
+              }
+          });
+          
+          if (!hasProducts) {
+              e.preventDefault();
+              alert('กรุณาเลือกสินค้าอย่างน้อย 1 รายการ');
+          }
+      });
+      
+      // เพิ่ม event listeners ให้กับรายการสินค้าที่มีอยู่แล้ว
+      document.querySelectorAll('.product-item').forEach(item => {
+          addItemEventListeners(item);
+      });
+      
+      // อัพเดทสรุปรายการเริ่มต้น
+      updateOrderSummary();
+  });
+</script>
+{% endblock %}
+
